@@ -42,14 +42,12 @@ contract GenericProposal is IProposal, Ownable {
 		// cool! voting is over and the majority said YES -> so let's go!
 		// as long as we call this method from WITHIN the vote contract 
 		// isCanDoAction() should return yes if voting finished with Yes result
-		if(!address(target).call(
+		require(address(target).call(
 			bytes4(keccak256(methodSig)),
 			uint256(32),				// pointer to the length of the array
 			uint256(params.length), // length of the array
 			params)
-		){
-			revert();
-		}						
+		);
 	}
 
 	function setVoting(IVoting _voting) external onlyOwner{
@@ -62,7 +60,7 @@ contract GenericProposal is IProposal, Ownable {
 }
 
 /**
- * @title GenericProposal 
+ * @title InformalProposal 
  * @dev This is the implementation of IProposal interface. Each Proposal should have voting attached. 
  * This proposal has no action and no consequences 
  * It should be used just for informal purps. 
@@ -91,5 +89,53 @@ contract InformalProposal is IProposal, Ownable {
 
 	function action()public{
 		return;
+	}
+}
+
+/**
+ * @title GenericProposal2
+ * @dev This is the implementation of IProposal interface. Each Proposal should have voting attached. 
+ * This is an auto proposal that is used by GenericCaller to call actions on a _target 
+ * Used by GenericCaller, DaoBaseAuto, MoneyflowAuto, etc
+*/
+contract GenericProposal2 is IProposal, Ownable {
+	IVoting voting;
+	address target;
+	bytes data;			// ABI encoded data
+
+	constructor(address _target, address _origin, bytes _data) public {
+		target = _target;
+		data = _data;
+
+		if(_origin==0x0){
+			revert();
+		}
+	}
+
+	event GenericProposal2_Action(IVoting _voting);
+
+// IVoting implementation
+	function action() external {
+		emit GenericProposal2_Action(voting);
+
+		// in some cases voting is still not set
+		if(0x0!=address(voting)){
+			require(msg.sender==address(voting));
+		}
+
+		// cool! voting is over and the majority said YES -> so let's go!
+		// as long as we call this method from WITHIN the vote contract 
+		// isCanDoAction() should return yes if voting finished with Yes result
+
+		// This does not allow money transfers!
+		require(target.call.value(0)(data));
+	}
+
+	function setVoting(IVoting _voting) external onlyOwner{
+		voting = _voting;
+	}
+
+	function getVoting()external view returns(IVoting){
+		return voting;
 	}
 }
