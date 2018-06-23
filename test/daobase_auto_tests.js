@@ -354,4 +354,28 @@ global.contract('DaoBaseAuto', (accounts) => {
 		const proposalsCount2 = await daoBase.getProposalsCount();
 		global.assert.equal(proposalsCount2,1,'New proposal should be added'); 
 	});
+
+    global.it('should be able to add group member with AAC (direct call)', async() => {
+        // set permissions 
+        await daoBase.allowActionByAddress("manageGroups", aacInstance.address);
+
+        // check permissions
+        const isCanDoAction = await daoBase.isCanDoAction(creator, "manageGroups");
+        global.assert.equal(isCanDoAction, true, 'Creator should have permission to run action');
+
+        // check membership
+        const isEmployeePresented = await daoBase.isGroupMember("Employees", employee1);
+        global.assert.equal(isEmployeePresented, false, 'Employee1 should not be employee of the company');
+
+        // Direct call
+        await aacInstance.addGroupMemberAuto("Employees", employee1, {from:creator});
+
+        // new proposal should NOT be added (direct call)
+        const proposalsCount = await daoBase.getProposalsCount();
+        global.assert.equal(proposalsCount, 0, 'No proposals should be added');
+
+        // check membership
+        const isEmployeeAdded = await daoBase.isGroupMember("Employees", employee1);
+        global.assert.equal(isEmployeeAdded, true, 'Employee1 should be added as the company`s employee');
+    });
 });
