@@ -9,13 +9,13 @@ import "./IDaoBase.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
 /**
- * @title DaoBase 
+ * @title DaoBase
  * @dev This is the base contract that you should use.
- * 
+ *
  * 1. This contract will be the owner of the 'store' and all 'tokens' inside the store!
  * It will transfer ownership only during upgrade
  *
- * 2. Currently DaoBase works only with StdDaoToken. It does not support working with 
+ * 2. Currently DaoBase works only with StdDaoToken. It does not support working with
  * plain ERC20 tokens because we need some extra features like mint(), burn() and transferOwnership()
 */
 contract DaoBase is IDaoBase, Ownable {
@@ -38,7 +38,7 @@ contract DaoBase is IDaoBase, Ownable {
 		// WARNING: please! do not forget to transfer the store
 		// ownership to the Dao (this contract)
 		// Like this:
-		// 
+		//
 		// store.transferOwnership(daoBase);
 
 		// WARNING: please! do not forget to transfer all tokens'
@@ -49,8 +49,8 @@ contract DaoBase is IDaoBase, Ownable {
 	}
 
 	modifier isCanDo(string _what){
-		require(_isCanDoAction(msg.sender,_what)); 
-		_; 
+		require(_isCanDoAction(msg.sender,_what));
+		_;
 	}
 
 // IDaoBase:
@@ -121,7 +121,7 @@ contract DaoBase is IDaoBase, Ownable {
 	 * 1. if caller is in the whitelist -> allow
 	 * 2. if caller is in the group and this action can be done by group members -> allow
 	 * 3. if caller is shareholder and this action can be done by a shareholder -> allow
-	 * 4. if this action requires voting 
+	 * 4. if this action requires voting
 	 *    a. caller is in the majority -> allow
 	 *    b. caller is voting and it is succeeded -> allow
 	 * 4. deny
@@ -147,7 +147,7 @@ contract DaoBase is IDaoBase, Ownable {
 		for(uint i=0; i<store.getAllTokenAddresses().length; ++i){
 
 			// 2 - check if shareholder can do that without voting?
-			if(store.isCanDoByShareholder(_permissionNameHash, store.getAllTokenAddresses()[i]) && 
+			if(store.isCanDoByShareholder(_permissionNameHash, store.getAllTokenAddresses()[i]) &&
 				(store.getAllTokenAddresses()[i].balanceOf(_a)!=0)){
 				return true;
 			}
@@ -161,15 +161,15 @@ contract DaoBase is IDaoBase, Ownable {
 				(isVotingFound, votingResult) = store.getProposalVotingResults(_a);
 
 				if(isVotingFound){
-					// if this action can be done by voting, then Proposal can do this action 
+					// if this action can be done by voting, then Proposal can do this action
 					// from within its context
 					// in this case msg.sender is a Voting!
 					return votingResult;
 				}
 
-				// 4 - only token holders with > 51% of gov.tokens can add new task immediately 
+				// 4 - only token holders with > 51% of gov.tokens can add new task immediately
 				// otherwise -> start voting
-				bool isInMajority = 
+				bool isInMajority =
 					(store.getAllTokenAddresses()[i].balanceOf(_a)) >
 					(store.getAllTokenAddresses()[i].totalSupply()/2);
 				if(isInMajority){
@@ -182,7 +182,7 @@ contract DaoBase is IDaoBase, Ownable {
 	}
 
 // Proposals:
-	function addNewProposal(IProposal _proposal) external isCanDo("addNewProposal") { 
+	function addNewProposal(IProposal _proposal) external isCanDo("addNewProposal") {
 		emit DaoBase_AddNewProposal(address(_proposal));
 		store.addNewProposal(_proposal);
 	}
@@ -237,11 +237,11 @@ contract DaoBase is IDaoBase, Ownable {
  * @dev Use this contract instead of DaoBase if you need DaoBaseAuto.
  * It features method unpackers that will convert bytes32[] params to the method params.
  *
- * When DaoBaseAuto will creates voting/proposal -> it packs params into the bytes32[] 
+ * When DaoBaseAuto will creates voting/proposal -> it packs params into the bytes32[]
  * After voting is finished -> target method is called and params should be unpacked
 */
 contract DaoBaseWithUnpackers is DaoBase {
-	constructor(DaoStorage _store) public 
+	constructor(DaoStorage _store) public
 		DaoBase(_store)
 	{
 	}
@@ -267,12 +267,38 @@ contract DaoBaseWithUnpackers is DaoBase {
 		_issueTokens(_tokenAddress, _to, _amount);
 	}
 
-	// TODO: add other methods:
-	/*
-	function removeGroupMember(string _groupName, address _a) public isCanDo("manageGroups"){
-	function allowActionByShareholder(string _what, address _tokenAddress) public isCanDo("manageGroups"){
-	function allowActionByVoting(string _what, address _tokenAddress) public isCanDo("manageGroups"){
-	function allowActionByAddress(string _what, address _a) public isCanDo("manageGroups"){
-	function allowActionByAnyMemberOfGroup(string _what, string _groupName) public isCanDo("manageGroups"){
-   */
+  function allowActionByShareholderGeneric(bytes32[] _params) external {
+    bytes32 _what = bytes32(_params[0]);
+    address _tokenAddress = address(_params[1]);
+
+    store.allowActionByShareholder(_what, _tokenAddress);
+  }
+
+  function allowActionByVotingGeneric(bytes32[] _params) external {
+    bytes32 _what = bytes32(_params[0]);
+    address _tokenAddress = address(_params[1]);
+
+    store.allowActionByVoting(_what, _tokenAddress);
+  }
+
+  function allowActionByAddressGeneric(bytes32[] _params) external {
+    bytes32 _what = bytes32(_params[0]);
+    address _a = address(_params[1]);
+
+    store.allowActionByAddress(_what, _a);
+  }
+
+  function allowActionByAnyMemberOfGroupGeneric(bytes32[] _params) external {
+    bytes32 _what = bytes32(_params[0]);
+    bytes32 _groupName = bytes32(_params[1]);
+
+    store.allowActionByAnyMemberOfGroup(_what, _groupName);
+  }
+
+  function removeGroupMemberGeneric(bytes32[] _params) external {
+    bytes32 _groupHash = bytes32(_params[0]);
+    address _a = address(_params[1]);
+
+    store.removeGroupMember(_groupHash, _a);
+  }
 }
