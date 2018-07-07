@@ -57,11 +57,20 @@ contract DaoBaseImpersonated is ImpersonationCaller {
   event DaoBaseImpersonated_AllowActionByVoting(string _what, address _tokenAddress);
   event DaoBaseImpersonated_AllowActionByAddress(string _group, address _a);
   event DaoBaseImpersonated_AllowActionByAnyMemberOfGroup(string _what, string _groupName);
+  event DaoBaseImpersonated_AddGroup(string _group);
   event DaoBaseImpersonated_RemoveGroupMember(string _groupName, address _a);
+  event DaoBaseImpersonated_AddGroupMember(string _groupName, address _a);
   constructor(IDaoBase _dao)public
 		ImpersonationCaller(_dao)
 	{
 	}
+
+  function upgradeDaoContractImp(bytes32 _hash, bytes _sig, address _newMc) public {
+    bytes32[] memory params = new bytes32[](1);
+    params[0] = bytes32(_newMc);
+
+    return doActionOnBehalfOf(_hash, _sig, "upgradeDaoContract", "upgradeDaoContractGeneric(bytes32[])", params);
+  }
 
 	function issueTokensImp(bytes32 _hash, bytes _sig,
 									 address _token, address _to, uint _amount) public {
@@ -70,7 +79,7 @@ contract DaoBaseImpersonated is ImpersonationCaller {
 		params[1] = bytes32(_to);
 		params[2] = bytes32(_amount);
 
-	   return doActionOnBehalfOf(_hash, _sig, "issueTokens", "issueTokensGeneric(bytes32[])", params);
+    return doActionOnBehalfOf(_hash, _sig, "issueTokens", "issueTokensGeneric(bytes32[])", params);
 	}
 
   function allowActionByShareholderImp(bytes32 _hash, bytes _sig, string _what, address _tokenAddress) public {
@@ -117,12 +126,19 @@ contract DaoBaseImpersonated is ImpersonationCaller {
 
     return doActionOnBehalfOf(_hash, _sig, "removeGroupMember", "removeGroupMemberGeneric(bytes32[])", params);
   }
+
+  function addGroupMemberImp(bytes32 _hash, bytes _sig, string _groupName, address _a) public {
+    emit DaoBaseImpersonated_AddGroupMember(_groupName, _a);
+    bytes32[] memory params = new bytes32[](2);
+    params[0] = bytes32(_groupName);
+    params[1] = bytes32(_a);
+
+    return doActionOnBehalfOf(_hash, _sig, "addGroupMember", "addGroupMemberGeneric(bytes32[])", params);
+  }
+
     // TODO: add other methods:
 	/*
-	function upgradeDaoContractImp(address _newMc) public returns(address proposalOut);
 	function addGroup(string _groupName) public isCanDo("manageGroups")
-	function addGroupMemberImp(string _group, address _a) public returns(address proposalOut);
-	function allowActionByAnyMemberOfGroup(string _what, string _groupName) public isCanDo("manageGroups"){
    ...
    */
 }
