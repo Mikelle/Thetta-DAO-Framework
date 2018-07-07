@@ -53,7 +53,7 @@ contract DaoBaseAuto is GenericCaller {
     params[0] = bytes32(keccak256(_groupName));
     params[1] = bytes32(_a);
 
-    return doAction("manageGroups", dao, msg.sender, "removeGroupMemberGeneric(bytes32[])", params);
+    return doAction(MANAGE_GROUPS, dao, msg.sender, "removeGroupMemberGeneric(bytes32[])", params);
   }
 
   function allowActionByShareholderAuto(string _what, address _tokenAddress) public returns(address proposalOut) {
@@ -61,7 +61,7 @@ contract DaoBaseAuto is GenericCaller {
     params[0] = bytes32(keccak256(_what));
     params[1] = bytes32(_tokenAddress);
 
-    return doAction("manageGroups", dao, msg.sender, "allowActionByShareholderGeneric(bytes32[])", params);
+    return doAction(MANAGE_GROUPS, dao, msg.sender, "allowActionByShareholderGeneric(bytes32[])", params);
   }
 
   function allowActionByVotingAuto(string _what, address _tokenAddress) public returns(address proposalOut) {
@@ -69,7 +69,7 @@ contract DaoBaseAuto is GenericCaller {
     params[0] = bytes32(keccak256(_what));
     params[1] = bytes32(_tokenAddress);
 
-    return doAction("manageGroups", dao, msg.sender, "allowActionByVotingGeneric(bytes32[])", params);
+    return doAction(MANAGE_GROUPS, dao, msg.sender, "allowActionByVotingGeneric(bytes32[])", params);
   }
 
   function allowActionByAddressAuto(string _what, address _a) public returns(address proposalOut) {
@@ -77,7 +77,7 @@ contract DaoBaseAuto is GenericCaller {
     params[0] = bytes32(keccak256(_what));
     params[1] = bytes32(_a);
 
-    return doAction("manageGroups", dao, msg.sender, "allowActionByAddressGeneric(bytes32[])", params);
+    return doAction(MANAGE_GROUPS, dao, msg.sender, "allowActionByAddressGeneric(bytes32[])", params);
   }
 
   function allowActionByAnyMemberOfGroupAuto(string _what, string _groupName) public returns(address proposalOut) {
@@ -85,7 +85,7 @@ contract DaoBaseAuto is GenericCaller {
     params[0] = bytes32(keccak256(_what));
     params[1] = bytes32(keccak256(_groupName));
 
-    return doAction("manageGroups", dao, msg.sender, "allowActionByAnyMemberOfGroupGeneric(bytes32[])", params);
+    return doAction(MANAGE_GROUPS, dao, msg.sender, "allowActionByAnyMemberOfGroupGeneric(bytes32[])", params);
   }
 
 	// TODO: add other methods:

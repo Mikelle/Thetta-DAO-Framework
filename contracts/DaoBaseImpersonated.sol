@@ -12,7 +12,14 @@ import "zeppelin-solidity/contracts/ECRecovery.sol";
 */
 contract ImpersonationCaller is DaoClient {
 
-	bytes32 constant public ISSUE_TOKENS = keccak256("issueTokens");
+  bytes32 constant public ISSUE_TOKENS = keccak256("issueTokens");
+  bytes32 constant public ALLOW_ACTION_BY_SHAREHOLDER = keccak256("allowActionByShareholder");
+  bytes32 constant public ALLOW_ACTION_BY_VOTING = keccak256("allowActionByVoting");
+  bytes32 constant public ALLOW_ACTION_BY_ADDRESS = keccak256("allowActionByAddress");
+  bytes32 constant public ALLOW_ACTION_BY_ANY_MEMBER_OF_GROUP = keccak256("allowActionByAnyMemberOfGroup");
+  bytes32 constant public REMOVE_GROUP_MEMBER = keccak256("removeGroupMember");
+  bytes32 constant public ADD_GROUP_MEMBER = keccak256("addGroupMember");
+  bytes32 constant public UPGRADE_DAO_CONTRACT = keccak256("upgradeDaoContract");
 
 	constructor(IDaoBase _dao) public DaoClient(_dao) {
 
@@ -72,7 +79,7 @@ contract DaoBaseImpersonated is ImpersonationCaller {
     bytes32[] memory params = new bytes32[](1);
     params[0] = bytes32(_newMc);
 
-    return doActionOnBehalfOf(_hash, _sig, "upgradeDaoContract", "upgradeDaoContractGeneric(bytes32[])", params);
+    return doActionOnBehalfOf(_hash, _sig, UPGRADE_DAO_CONTRACT, "upgradeDaoContractGeneric(bytes32[])", params);
   }
 
 	function issueTokensImp(bytes32 _hash, bytes _sig,
@@ -91,7 +98,7 @@ contract DaoBaseImpersonated is ImpersonationCaller {
     params[0] = bytes32(keccak256(_what));
     params[1] = bytes32(_tokenAddress);
 
-    return doActionOnBehalfOf(_hash, _sig, "allowActionByShareholder", "allowActionByShareholderGeneric(bytes32[])", params);
+    return doActionOnBehalfOf(_hash, _sig, ALLOW_ACTION_BY_SHAREHOLDER, "allowActionByShareholderGeneric(bytes32[])", params);
   }
 
   function allowActionByVotingImp(bytes32 _hash, bytes _sig, string _what, address _tokenAddress) public {
@@ -100,7 +107,7 @@ contract DaoBaseImpersonated is ImpersonationCaller {
     params[0] = bytes32(keccak256(_what));
     params[1] = bytes32(_tokenAddress);
 
-    return doActionOnBehalfOf(_hash, _sig, "allowActionByVoting", "allowActionByVotingGeneric(bytes32[])", params);
+    return doActionOnBehalfOf(_hash, _sig, ALLOW_ACTION_BY_VOTING, "allowActionByVotingGeneric(bytes32[])", params);
   }
 
   function allowActionByAddressImp(bytes32 _hash, bytes _sig, string _what, address _a) public {
@@ -109,7 +116,7 @@ contract DaoBaseImpersonated is ImpersonationCaller {
     params[0] = bytes32(keccak256(_what));
     params[1] = bytes32(_a);
 
-    return doActionOnBehalfOf(_hash, _sig, "allowActionByAddress", "allowActionByAddressGeneric(bytes32[])", params);
+    return doActionOnBehalfOf(_hash, _sig, ALLOW_ACTION_BY_ADDRESS, "allowActionByAddressGeneric(bytes32[])", params);
   }
 
   function allowActionByAnyMemberOfGroupImp(bytes32 _hash, bytes _sig, string _what, string _groupName) public {
@@ -118,7 +125,7 @@ contract DaoBaseImpersonated is ImpersonationCaller {
     params[0] = bytes32(keccak256(_what));
     params[1] = bytes32(keccak256(_groupName));
 
-    return doActionOnBehalfOf(_hash, _sig, "allowActionByAnyMemberOfGroup", "allowActionByAnyMemberOfGroupGeneric(bytes32[])", params);
+    return doActionOnBehalfOf(_hash, _sig, ALLOW_ACTION_BY_ANY_MEMBER_OF_GROUP, "allowActionByAnyMemberOfGroupGeneric(bytes32[])", params);
   }
 
   function removeGroupMemberImp(bytes32 _hash, bytes _sig, string _groupName, address _a) public {
@@ -127,7 +134,7 @@ contract DaoBaseImpersonated is ImpersonationCaller {
     params[1] = bytes32(keccak256(_groupName));
     params[1] = bytes32(_a);
 
-    return doActionOnBehalfOf(_hash, _sig, "removeGroupMember", "removeGroupMemberGeneric(bytes32[])", params);
+    return doActionOnBehalfOf(_hash, _sig, REMOVE_GROUP_MEMBER, "removeGroupMemberGeneric(bytes32[])", params);
   }
 
   function addGroupMemberImp(bytes32 _hash, bytes _sig, string _groupName, address _a) public {
@@ -136,7 +143,7 @@ contract DaoBaseImpersonated is ImpersonationCaller {
     params[1] = bytes32(keccak256(_groupName));
     params[1] = bytes32(_a);
 
-    return doActionOnBehalfOf(_hash, _sig, "addGroupMember", "addGroupMemberGeneric(bytes32[])", params);
+    return doActionOnBehalfOf(_hash, _sig, ADD_GROUP_MEMBER, "addGroupMemberGeneric(bytes32[])", params);
   }
 
     // TODO: add other methods:
