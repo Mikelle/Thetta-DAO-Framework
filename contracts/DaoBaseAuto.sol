@@ -45,7 +45,7 @@ contract DaoBaseAuto is GenericCaller {
 
   function removeGroupMemberAuto(string _groupName, address _a) public returns(address proposalOut) {
     bytes32[] memory params = new bytes32[](2);
-    params[0] = bytes32(keccak256(_group));
+    params[0] = bytes32(keccak256(_groupName));
     params[1] = bytes32(_a);
 
     return doAction("manageGroups", dao, msg.sender, "removeGroupMemberGeneric(bytes32[])", params);

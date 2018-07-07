@@ -51,7 +51,7 @@ contract('DaoBaseAuto', (accounts) => {
 	const employee2 = accounts[2];
 	const employee3 = accounts[3];
 	const outsider = accounts[4];
-	const output = accounts[5]; 
+	const output = accounts[5];
 
 	let money = web3.toWei(0.001, "ether");
 
@@ -71,8 +71,8 @@ contract('DaoBaseAuto', (accounts) => {
 		await token.mint(employee2, 600);
 		await token.mint(employee3, 600);
 
-		store = await DaoStorage.new([token.address],{gas: 10000000, from: creator});
-		daoBase = await DaoBaseWithUnpackers.new(store.address,{gas: 10000000, from: creator});
+		store = await DaoStorage.new([token.address],{from: creator});
+		daoBase = await DaoBaseWithUnpackers.new(store.address,{from: creator});
 		aacInstance = await DaoBaseAuto.new(daoBase.address, {from: creator});
 
 		///////////////////////////////////////////////////
@@ -103,7 +103,7 @@ contract('DaoBaseAuto', (accounts) => {
 
 		// THIS IS REQUIRED because issueTokensAuto() will add new proposal (voting)
 		// because of this AAC can't add new proposal!
-		// 
+		//
 		//await daoBase.allowActionByAddress("addNewProposal", aacInstance.address);
 
 		//////
@@ -115,21 +115,21 @@ contract('DaoBaseAuto', (accounts) => {
 		const isEmployeeAdded = await daoBase.isGroupMember("Employees", employee1);
 		assert.strictEqual(isEmployeeAdded,true,'employee1 should be added as the company`s employee');
 
-		// new proposal should NOT be added 
+		// new proposal should NOT be added
 		await CheckExceptions.checkContractThrows(aacInstance.issueTokensAuto.sendTransaction,
 			[token.address,employee1,1000,{ from: employee1}],
 			'Should not be able to issue tokens AND add new proposal');
 
 		const proposalsCount2 = await daoBase.getProposalsCount();
-		assert.equal(proposalsCount2,0,'No new proposal should be added'); 
+		assert.equal(proposalsCount2,0,'No new proposal should be added');
 	});
 
 	it('should not issue tokens automatically because issueTokens cant be called even with voting',async() => {
 		await daoBase.allowActionByAnyMemberOfGroup("addNewProposal","Employees");
 		await daoBase.allowActionByVoting("manageGroups", token.address);
 
-		// SEE this -> this permissions is commented! So even if AAC has rights to add proposal, 
-		// the proposal will never be finished 
+		// SEE this -> this permissions is commented! So even if AAC has rights to add proposal,
+		// the proposal will never be finished
 		// await daoBase.allowActionByVoting("issueTokens", token.address);
 
 		// THIS IS REQUIRED because issueTokensAuto() will add new proposal (voting)
@@ -170,14 +170,14 @@ contract('DaoBaseAuto', (accounts) => {
 		const isCanDo4 = await daoBase.isCanDoAction(aacInstance.address,"addNewProposal");
 		assert.strictEqual(isCanDo4,true,'aacInstance can addNewProposal');
 
-		// new proposal should be added 
+		// new proposal should be added
 		await aacInstance.issueTokensAuto(token.address,employee1,1200,{from: employee1, gas:10000000, gasPrice:0});
 
 		// STOP!!!
-		//assert.equal(0,1,'STOP'); 
+		//assert.equal(0,1,'STOP');
 
 		const proposalsCount2 = await daoBase.getProposalsCount();
-		assert.equal(proposalsCount2,1,'New proposal should be added'); 
+		assert.equal(proposalsCount2,1,'New proposal should be added');
 
 		// // check the voting data
 		const pa = await daoBase.getProposalAtIndex(0);
@@ -245,10 +245,10 @@ contract('DaoBaseAuto', (accounts) => {
 		const isCanDo2 = await daoBase.isCanDoAction(employee1,"addNewProposal");
 		assert.strictEqual(isCanDo2,true,'employee1 can add new vote');
 
-		// new proposal should be added 
+		// new proposal should be added
 		await aacInstance.issueTokensAuto(token.address,employee1,1000,{from: employee1});
 		const proposalsCount2 = await daoBase.getProposalsCount();
-		assert.equal(proposalsCount2,1,'New proposal should be added'); 
+		assert.equal(proposalsCount2,1,'New proposal should be added');
 
 		// check the voting data
 		const pa = await daoBase.getProposalAtIndex(0);
@@ -280,7 +280,7 @@ contract('DaoBaseAuto', (accounts) => {
 		const balance2 = await token.balanceOf(employee1);
 		assert.strictEqual(balance2.toNumber(),1600,'employee1 balance should be updated');
 
-		// should not call vote again 
+		// should not call vote again
 		await CheckExceptions.checkContractThrows(voting.vote.sendTransaction,
 			[true, 0, { from: employee1}],
 			'Should not call action again');
@@ -353,9 +353,9 @@ contract('DaoBaseAuto', (accounts) => {
 		const isCanDo2 = await daoBase.isCanDoAction(employee1,"addNewProposal");
 		assert.strictEqual(isCanDo2,true,'employee1 can add new vote');
 
-		// new proposal should be added 
+		// new proposal should be added
 		await aacInstance.issueTokensAuto(token.address,employee1,1000,{from: employee1});
 		const proposalsCount2 = await daoBase.getProposalsCount();
-		assert.equal(proposalsCount2,1,'New proposal should be added'); 
+		assert.equal(proposalsCount2,1,'New proposal should be added');
 	});
 });

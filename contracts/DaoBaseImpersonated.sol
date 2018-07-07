@@ -85,7 +85,7 @@ contract DaoBaseImpersonated is ImpersonationCaller {
   function allowActionByShareholderImp(bytes32 _hash, bytes _sig, string _what, address _tokenAddress) public {
     emit DaoBaseImpersonated_AllowActionByShareholder(_what, _tokenAddress);
     bytes32[] memory params = new bytes32[](2);
-    params[0] = bytes32(_what);
+    params[0] = bytes32(keccak256(_what));
     params[1] = bytes32(_tokenAddress);
 
     return doActionOnBehalfOf(_hash, _sig, "allowActionByShareholder", "allowActionByShareholderGeneric(bytes32[])", params);
@@ -94,7 +94,7 @@ contract DaoBaseImpersonated is ImpersonationCaller {
   function allowActionByVotingImp(bytes32 _hash, bytes _sig, string _what, address _tokenAddress) public {
     emit DaoBaseImpersonated_AllowActionByVoting(_what, _tokenAddress);
     bytes32[] memory params = new bytes32[](2);
-    params[0] = bytes32(_what);
+    params[0] = bytes32(keccak256(_what));
     params[1] = bytes32(_tokenAddress);
 
     return doActionOnBehalfOf(_hash, _sig, "allowActionByVoting", "allowActionByVotingGeneric(bytes32[])", params);
@@ -103,7 +103,7 @@ contract DaoBaseImpersonated is ImpersonationCaller {
   function allowActionByAddressImp(bytes32 _hash, bytes _sig, string _what, address _a) public {
     emit DaoBaseImpersonated_AllowActionByAddress(_what, _a);
     bytes32[] memory params = new bytes32[](2);
-    params[0] = bytes32(_what);
+    params[0] = bytes32(keccak256(_what));
     params[1] = bytes32(_a);
 
     return doActionOnBehalfOf(_hash, _sig, "allowActionByAddress", "allowActionByAddressGeneric(bytes32[])", params);
@@ -112,8 +112,8 @@ contract DaoBaseImpersonated is ImpersonationCaller {
   function allowActionByAnyMemberOfGroupImp(bytes32 _hash, bytes _sig, string _what, string _groupName) public {
     emit DaoBaseImpersonated_AllowActionByAnyMemberOfGroup(_what, _groupName);
     bytes32[] memory params = new bytes32[](2);
-    params[0] = bytes32(_what);
-    params[1] = bytes32(_groupName);
+    params[0] = bytes32(keccak256(_what));
+    params[1] = bytes32(keccak256(_groupName));
 
     return doActionOnBehalfOf(_hash, _sig, "allowActionByAnyMemberOfGroup", "allowActionByAnyMemberOfGroupGeneric(bytes32[])", params);
   }
@@ -121,7 +121,7 @@ contract DaoBaseImpersonated is ImpersonationCaller {
   function removeGroupMemberImp(bytes32 _hash, bytes _sig, string _groupName, address _a) public {
     emit DaoBaseImpersonated_RemoveGroupMember(_groupName, _a);
     bytes32[] memory params = new bytes32[](2);
-    params[0] = bytes32(_groupName);
+    params[1] = bytes32(keccak256(_groupName));
     params[1] = bytes32(_a);
 
     return doActionOnBehalfOf(_hash, _sig, "removeGroupMember", "removeGroupMemberGeneric(bytes32[])", params);
@@ -130,7 +130,7 @@ contract DaoBaseImpersonated is ImpersonationCaller {
   function addGroupMemberImp(bytes32 _hash, bytes _sig, string _groupName, address _a) public {
     emit DaoBaseImpersonated_AddGroupMember(_groupName, _a);
     bytes32[] memory params = new bytes32[](2);
-    params[0] = bytes32(_groupName);
+    params[1] = bytes32(keccak256(_groupName));
     params[1] = bytes32(_a);
 
     return doActionOnBehalfOf(_hash, _sig, "addGroupMember", "addGroupMemberGeneric(bytes32[])", params);
