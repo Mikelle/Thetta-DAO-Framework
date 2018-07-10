@@ -1,7 +1,6 @@
 var DaoBaseWithUnpackers = artifacts.require("./DaoBaseWithUnpackers");
 var StdDaoToken = artifacts.require("./StdDaoToken");
 var DaoStorage = artifacts.require("./DaoStorage");
-var DaoBaseWithUnpackers = artifacts.require("./DaoBaseWithUnpackers");
 
 // to check how upgrade works with IDaoBase clients
 var MoneyFlow = artifacts.require("./MoneyFlow");
@@ -18,7 +17,7 @@ contract('DaoBase', (accounts) => {
 	let token;
 	let store;
 	let daoBase;
-	
+
 	let issueTokens;
 	let manageGroups;
 	let addNewProposal;
@@ -37,14 +36,10 @@ contract('DaoBase', (accounts) => {
 	const outsider = accounts[3];
 	const employee3 = accounts[4];
 
-	before(async() => {
-
-	});
-
 	beforeEach(async() => {
 		token = await StdDaoToken.new("StdToken","STDT",18, true, true, true, 1000000000);
 		await token.mint(creator, 1000);
-    
+
 		store = await DaoStorage.new([token.address],{from: creator});
 
 		// add creator as first employee
@@ -52,15 +47,15 @@ contract('DaoBase', (accounts) => {
 		await store.allowActionByAddress(KECCAK256("manageGroups"),creator);
 
 		daoBase = await DaoBaseWithUnpackers.new(store.address,{from: creator});
-		
+
 		issueTokens = await daoBase.ISSUE_TOKENS();
-		
+
 		manageGroups = await daoBase.MANAGE_GROUPS();
-		
+
 		upgradeDaoContract = await daoBase.UPGRADE_DAO_CONTRACT();
 
 		addNewProposal = await daoBase.ADD_NEW_PROPOSAL();
-		
+
 		burnTokens = await daoBase.BURN_TOKENS();
 
 		// do not forget to transfer ownership
@@ -178,7 +173,7 @@ contract('DaoBase', (accounts) => {
 
 		// now try to withdraw donations with new mc
 		const money = 1000000000;
-		const dea = await moneyflowInstance.getDonationEndpoint(); 
+		const dea = await moneyflowInstance.getDonationEndpoint();
 		const donationEndpoint = await IWeiReceiver.at(dea);
 		await donationEndpoint.processFunds(money, { from: creator, value: money, gasPrice: 0});
 
@@ -194,7 +189,7 @@ contract('DaoBase', (accounts) => {
 		let balanceDelta = outBalance2.toNumber() - outBalance.toNumber();
 
 		// TODO: fix that!!!
-		// TODO: why not working? 
+		// TODO: why not working?
 		//assert.equal(balanceDelta, money, 'all donations now on outsiders`s balance');
 
 		let donationBalance2 = await web3.eth.getBalance(donationEndpoint.address);
@@ -206,7 +201,7 @@ contract('DaoBase', (accounts) => {
 		await daoBase.addGroupMember("Employees", employee2);
 		await daoBase.addGroupMember("Employees", employee3);
 
-		await CheckExceptions.checkContractThrows(daoBase.addGroupMember, 
+		await CheckExceptions.checkContractThrows(daoBase.addGroupMember,
 			["Employees", employee3]); //Shouldnt add again
 
 		assert.strictEqual(await daoBase.isGroupMember("Employees", employee1),

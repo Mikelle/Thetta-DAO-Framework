@@ -72,10 +72,6 @@ contract('DaoBaseAuto', (accounts) => {
 	let store;
 	let aacInstance;
 
-	before(async() => {
-
-	});
-
 	beforeEach(async() => {
 		token = await StdDaoToken.new("StdToken","STDT",18, true, true, true, 1000000000);
 		await token.mint(creator, 1000);
@@ -85,7 +81,7 @@ contract('DaoBaseAuto', (accounts) => {
 
 		store = await DaoStorage.new([token.address],{ from: creator });
 		daoBase = await DaoBaseWithUnpackers.new(store.address,{ from: creator });
-		aacInstance = await DaoBaseAuto.new(daoBase.address, {from: creator});
+    aacInstance = await DaoBaseAuto.new(daoBase.address, { from: creator});
 
 		issueTokens = await aacInstance.ISSUE_TOKENS();
 
@@ -97,7 +93,7 @@ contract('DaoBaseAuto', (accounts) => {
 
 		burnTokens = await daoBase.BURN_TOKENS();
 
-		///////////////////////////////////////////////////
+		/////////////////////////////////////////////////
 		// SEE THIS? set voting type for the action!
 		const VOTING_TYPE_1P1V = 1;
 		const VOTING_TYPE_SIMPLE_TOKEN = 2;
@@ -118,11 +114,11 @@ contract('DaoBaseAuto', (accounts) => {
 	it('should not automatically create proposal because AAC has no rights',async() => {
 		// Set permissions:
 
-			await daoBase.allowActionByAnyMemberOfGroup(addNewProposal,"Employees");
+    await daoBase.allowActionByAnyMemberOfGroup(addNewProposal,"Employees");
 
-			await daoBase.allowActionByVoting(manageGroups, token.address);
+    await daoBase.allowActionByVoting(manageGroups, token.address);
 
-			await daoBase.allowActionByVoting(issueTokens, token.address);
+    await daoBase.allowActionByVoting(issueTokens, token.address);
 
 		// THIS IS REQUIRED because issueTokensAuto() will add new proposal (voting)
 		// because of this AAC can't add new proposal!
