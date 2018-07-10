@@ -12,6 +12,8 @@ import "zeppelin-solidity/contracts/ECRecovery.sol";
 */
 contract ImpersonationCaller is DaoClient {
 
+	bytes32 public ISSUE_TOKENS = keccak256(abi.encodePacked("issueTokens"));
+
   bytes32 constant public ISSUE_TOKENS = keccak256("issueTokens");
   bytes32 constant public ALLOW_ACTION_BY_SHAREHOLDER = keccak256("allowActionByShareholder");
   bytes32 constant public ALLOW_ACTION_BY_VOTING = keccak256("allowActionByVoting");
@@ -41,7 +43,7 @@ contract ImpersonationCaller is DaoClient {
 
 		// 3 - call
 		if(!address(dao).call(
-			bytes4(keccak256(_methodSig)),
+			bytes4(keccak256(abi.encodePacked(_methodSig))),
 			uint256(32),						 // pointer to the length of the array
 			uint256(_params.length),		 // length of the array
 			_params)){
